@@ -8,8 +8,8 @@ import com.tennisrockt.jsl.exceptions.ServerException;
 
 public interface IDBCollection {
 	
-	public String getCollectionName();
-	public String getMongoUrl();
+	public String getCollectionName() throws ServerException;
+	public String getMongoUrl() throws ServerException;
 	
 	public default MongoCollection<Document> get() throws ServerException {
 		return DBConnectionUtils.get(getMongoUrl(), getCollectionName());
