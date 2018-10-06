@@ -8,6 +8,10 @@ import com.tennisrockt.jsl.exceptions.ServerException;
 
 public interface IDBCollection {
 	
+	public default void refreshConnection() throws ServerException {
+		DBConnectionUtils.refreshConnection(getMongoUrl());
+	}
+	
 	public String getCollectionName() throws ServerException;
 	public String getMongoUrl() throws ServerException;
 	

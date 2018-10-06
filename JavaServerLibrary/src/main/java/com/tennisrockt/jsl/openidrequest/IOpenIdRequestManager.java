@@ -16,4 +16,7 @@ public interface IOpenIdRequestManager {
 	public default JSONObject doRequest(String url, JSONObject body) throws ServerException {
 		return TokensManagerUtils.doRequest(getConfigUrl(), getUsername(), getPassword(), url, body);
 	}
+	public default void refreshConnection() throws ServerException {
+		TokensManagerUtils.updateConfig(getConfigUrl(), getUsername(), getPassword());
+	}
 }
