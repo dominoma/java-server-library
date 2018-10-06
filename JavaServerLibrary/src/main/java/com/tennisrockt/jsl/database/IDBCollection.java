@@ -35,7 +35,7 @@ public interface IDBCollection {
 		DBConnectionUtils.removeByID(getMongoUrl(), getCollectionName(), id);
 	}
 	
-	public static void close() {
+	public static void close() throws ServerException {
 		DBConnectionUtils.close();
 	}
 	
