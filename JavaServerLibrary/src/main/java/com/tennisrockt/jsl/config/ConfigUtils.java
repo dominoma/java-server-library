@@ -7,11 +7,10 @@ import com.tennisrockt.jsl.exceptions.ServerException;
 
 class ConfigUtils {
 	
-	private static URL consulUrl = null;
 	
 	private static ConsulClient consulClient;
 	
-	public static synchronized void refreshConnection() throws ServerException {
+	public static synchronized void refreshConnection(URL consulUrl) throws ServerException {
 		if(consulUrl != null) {
 			try {
 				consulClient = new ConsulClient(consulUrl.toExternalForm());
@@ -21,29 +20,18 @@ class ConfigUtils {
 		}
 	}
 	
-	public static synchronized void setupConnection() throws ServerException {
+	public static synchronized void setupConnection(URL consulUrl) throws ServerException {
 		if(consulClient == null) {
-			refreshConnection();
+			refreshConnection(consulUrl);
 		}
 	}
 	
-	public static URL getConsulUrl() {
-		return consulUrl;
-	}
-	
-	public static synchronized void setConsulUrl(URL url) {
-		if(consulClient != null) {
-			consulClient = null;
-		}
-		consulUrl = url;
-	}
-	
-	public static boolean useDefaultValues() {
+	public static boolean useDefaultValues(URL consulUrl) {
 		return consulUrl == null;
 	}
 	
-	public static String getValue(String keyName) throws ServerException {
-		setupConnection();
+	public static String getValue(URL consulUrl, String keyName) throws ServerException {
+		setupConnection(consulUrl);
 		return consulClient.getKVValue(keyName).getValue().getDecodedValue();
 	}
 }

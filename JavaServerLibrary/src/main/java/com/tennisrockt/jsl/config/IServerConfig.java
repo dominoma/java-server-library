@@ -6,24 +6,18 @@ import com.tennisrockt.jsl.exceptions.ServerException;
 
 public interface IServerConfig {
 	
-	public static void setConsulUrl(URL url) {
-		ConfigUtils.setConsulUrl(url);
-	}
+	public URL getConsulUrl() throws ServerException;
 	
-	public static URL getConsulUrl() {
-		return ConfigUtils.getConsulUrl();
-	}
-	
-	public static void refreshConnection() throws ServerException {
-		ConfigUtils.refreshConnection();
+	public default void refreshConnection() throws ServerException {
+		ConfigUtils.refreshConnection(getConsulUrl());
 	}
 	
 	public default String value() throws ServerException {
-		if(ConfigUtils.useDefaultValues()) {
+		if(ConfigUtils.useDefaultValues(getConsulUrl())) {
 			return defaultValue();
 		}
 		else {
-			return ConfigUtils.getValue(key());
+			return ConfigUtils.getValue(getConsulUrl(), key());
 		}
 	};
 	
