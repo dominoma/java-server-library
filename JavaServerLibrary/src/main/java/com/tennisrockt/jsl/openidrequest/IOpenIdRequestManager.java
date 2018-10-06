@@ -6,9 +6,9 @@ import com.tennisrockt.jsl.exceptions.ServerException;
 
 public interface IOpenIdRequestManager {
 	
-	public String getConfigUrl();
-	public String getUsername();
-	public String getPassword();
+	public String getConfigUrl() throws ServerException;
+	public String getUsername() throws ServerException;
+	public String getPassword() throws ServerException;
 	
 	public default JSONObject doRequest(String url) throws ServerException {
 		return doRequest(url, null);
