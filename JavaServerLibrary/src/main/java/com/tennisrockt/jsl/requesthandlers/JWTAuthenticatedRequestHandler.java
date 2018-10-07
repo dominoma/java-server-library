@@ -48,5 +48,5 @@ public abstract class JWTAuthenticatedRequestHandler extends RequestHandler {
 		return permissionLevel;
 	}
 	
-	public abstract KeyManager getKeyManager();
+	public abstract KeyManager getKeyManager() throws ServerException;
 }
