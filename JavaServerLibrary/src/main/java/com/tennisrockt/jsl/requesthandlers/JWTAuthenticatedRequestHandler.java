@@ -3,7 +3,7 @@ package com.tennisrockt.jsl.requesthandlers;
 import com.tennisrockt.jsl.exceptions.AuthenticationException;
 import com.tennisrockt.jsl.exceptions.RequestException;
 import com.tennisrockt.jsl.exceptions.ServerException;
-import com.tennisrockt.jsl.keymanager.IKeyManager;
+import com.tennisrockt.jsl.keymanager.KeyManager;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -48,5 +48,5 @@ public abstract class JWTAuthenticatedRequestHandler extends RequestHandler {
 		return permissionLevel;
 	}
 	
-	public abstract IKeyManager getKeyManager();
+	public abstract KeyManager getKeyManager();
 }

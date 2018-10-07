@@ -22,7 +22,7 @@ public class RequestHandlers {
 	private static void searchForRegistrations() throws ServerException {
 		if(handlers == null) {
 			handlers = new TreeMap<>();
-			Reflections ref = new Reflections("server.requesthandlers");
+			Reflections ref = new Reflections();
 	        for (Class<?> cl : ref.getTypesAnnotatedWith(RegisterHandler.class)) {
 	        	RegisterHandler registerHandler = cl.getAnnotation(RegisterHandler.class);
 	        	try {

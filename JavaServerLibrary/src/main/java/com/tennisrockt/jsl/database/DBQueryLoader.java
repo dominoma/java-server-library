@@ -100,7 +100,7 @@ public class DBQueryLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Document> execAggregation(String location, IDBCollection collection, String name, Object... arguments) throws ServerException {
+	public static List<Document> execAggregation(String location, DBCollection collection, String name, Object... arguments) throws ServerException {
 		Document aggregation = getAggregation(location, name, arguments);
 		List<Document> pipe = (List<Document>) aggregation.get("query");
 		List<Document> result = Lists.newArrayList(collection.get().aggregate(pipe));
