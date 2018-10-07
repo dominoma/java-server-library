@@ -4,7 +4,6 @@ import org.bson.Document;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.tennisrockt.jsl.exceptions.ServerException;
 
 public class DBConnection {
 	
@@ -18,17 +17,15 @@ public class DBConnection {
 		this.dbName = dbName;
 	}
 	
-	public synchronized void refreshConnection() throws ServerException {
-		try {
-			close();
-			mongoClient = new MongoClient(mongoUrl);
-			mongoClient.getDatabase(dbName);
-		} catch (Exception e) {
-			throw new ServerException(e);
-		}
+	public synchronized void refreshConnection() {
+		
+		close();
+		mongoClient = new MongoClient(mongoUrl);
+		mongoClient.getDatabase(dbName);
+		
 	}
 	
-	private synchronized void setupConnection() throws ServerException {
+	private synchronized void setupConnection() {
 		if(mongoClient == null) {
 			refreshConnection();
 		}
@@ -41,12 +38,12 @@ public class DBConnection {
 		}
 	}
 	
-	MongoCollection<Document> getRawCollection(String collectionName) throws ServerException {
+	MongoCollection<Document> getRawCollection(String collectionName) {
 		setupConnection();
 		return mongoClient.getDatabase(dbName).getCollection(collectionName);
 	}
 	
-	public DBCollection getCollection(String collectionName) throws ServerException {
+	public DBCollection getCollection(String collectionName) {
 		return new DBCollection(this, collectionName);
 	}
 
