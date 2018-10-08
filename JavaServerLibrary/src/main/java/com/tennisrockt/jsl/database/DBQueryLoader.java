@@ -19,7 +19,7 @@ public class DBQueryLoader {
 
 	private static final Map<String, Document> aggregations = new HashMap<>();
 	
-	private static Document getParsedAggregation(String location, String name) throws ServerException {
+	private static Document getParsedAggregation(String location, String name) {
 		if(aggregations.containsKey(name)) {
 			return aggregations.get(name);
 		}
@@ -58,7 +58,7 @@ public class DBQueryLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void setImports(String location, Document aggregation) throws ServerException {
+	private static void setImports(String location, Document aggregation) {
 		List<Document> imports = (List<Document>) aggregation.get("imports");
 		for(Object importObj : imports) {
 			Document dbimport = (Document) importObj;
@@ -88,7 +88,7 @@ public class DBQueryLoader {
 		}
 	}
 	
-	public static Document getAggregation(String location, String name, Object... arguments) throws ServerException {
+	public static Document getAggregation(String location, String name, Object... arguments) {
 		Document aggregation = getParsedAggregation(location, name);
 		if(aggregation.containsKey("vars")) {
 			setVars(aggregation, arguments);
@@ -100,7 +100,7 @@ public class DBQueryLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Document> execAggregation(String location, DBCollection collection, String name, Object... arguments) throws ServerException {
+	public static List<Document> execAggregation(String location, DBCollection collection, String name, Object... arguments) {
 		Document aggregation = getAggregation(location, name, arguments);
 		List<Document> pipe = (List<Document>) aggregation.get("query");
 		List<Document> result = Lists.newArrayList(collection.get().aggregate(pipe));

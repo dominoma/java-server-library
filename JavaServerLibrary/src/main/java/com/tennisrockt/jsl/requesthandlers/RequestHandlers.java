@@ -19,7 +19,7 @@ public class RequestHandlers {
 	
 	private static Map<String, RequestHandler> handlers;
 	
-	private static void searchForRegistrations() throws ServerException {
+	private static void searchForRegistrations() {
 		if(handlers == null) {
 			handlers = new TreeMap<>();
 			Reflections ref = new Reflections();
@@ -36,7 +36,7 @@ public class RequestHandlers {
 		}
 	}
 	
-	public static void redirect(String name, Request req, Response res) throws ServerException {
+	public static void redirect(String name, Request req, Response res) {
 		searchForRegistrations();
 		if(!handlers.containsKey(name)) {
 			throw new IllegalArgumentException("Handler with name '"+name+"' isn't registred!");
@@ -44,7 +44,7 @@ public class RequestHandlers {
 		handlers.get(name).handle(req, res);
 	}
 	
-	public static void install(Express express) throws ServerException {
+	public static void install(Express express) {
 		searchForRegistrations();
 		List<RequestHandler> handlerIcs = new ArrayList<>(handlers.values());
 		Collections.sort(handlerIcs, (arg0, arg1) -> {

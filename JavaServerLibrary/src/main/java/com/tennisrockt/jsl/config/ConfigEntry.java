@@ -1,8 +1,6 @@
 package com.tennisrockt.jsl.config;
 
-import com.tennisrockt.jsl.exceptions.ServerException;
-
-public class ConfigEntry {
+public class ConfigEntry implements ValueSupplier<String> {
 	
 	private final ConfigConnection connection;
 	private final String keyName;
@@ -18,7 +16,7 @@ public class ConfigEntry {
 
 
 
-	public String value() throws ServerException {
+	public String value() {
 		if(connection.useDefaultValues()) {
 			return defaultValue;
 		}

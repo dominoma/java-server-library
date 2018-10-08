@@ -26,7 +26,7 @@ public class ServerUtils {
 		}
 	}
 
-	public static JSONObject parseJSON(InputStream body) throws ServerException {
+	public static JSONObject parseJSON(InputStream body) {
 		
 		try {
 			return new JSONObject(toStringInputStream(body));

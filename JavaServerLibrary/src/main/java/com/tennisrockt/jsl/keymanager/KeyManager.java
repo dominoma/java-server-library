@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.tennisrockt.jsl.config.ValueSupplier;
 import com.tennisrockt.jsl.exceptions.ServerException;
 import com.tennisrockt.jsl.utils.ServerUtils;
 
@@ -34,13 +35,13 @@ public class KeyManager {
 	private final Lock readLock = readWriteLock.readLock();
 	private final Lock writeLock = readWriteLock.writeLock();
 	
-	private final String updateUrl;
+	private final ValueSupplier<String> updateUrl;
 	
-	public KeyManager(String updateUrl) {
+	public KeyManager(ValueSupplier<String> updateUrl) {
 		this.updateUrl = updateUrl;
 	}
 	
-	public Key convertToRSAKey(String modulus, String exponent) throws ServerException {
+	public Key convertToRSAKey(String modulus, String exponent) {
 		BigInteger dmodulus = new BigInteger(1, Base64.getUrlDecoder().decode(modulus));
         BigInteger dexponent = new BigInteger(1, Base64.getUrlDecoder().decode(exponent));
         try {
@@ -50,7 +51,7 @@ public class KeyManager {
 		}
 	}
 	
-	private void insertKeys(JSONArray keysJSON) throws ServerException {
+	private void insertKeys(JSONArray keysJSON) {
 		writeLock.lock();
 		try {
 			for(Object keyObj : keysJSON) {
@@ -67,9 +68,9 @@ public class KeyManager {
 		}
 	}
 	
-	public void updateKeys() throws ServerException {
+	public void updateKeys() {
 		try {
-			URL url = new URL(updateUrl);
+			URL url = new URL(updateUrl.value());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			JSONArray keysJSON = (JSONArray) ServerUtils.parseJSON(con.getInputStream()).get("keys");
@@ -79,7 +80,7 @@ public class KeyManager {
 		}
 	}
 	
-	public synchronized void refreshKeys() throws ServerException {
+	public synchronized void refreshKeys() {
 		keys.clear();
 		updateKeys();
 	}
@@ -88,7 +89,7 @@ public class KeyManager {
 		return keys.containsKey(keyID);
 	}
 	
-	public Key getKey(String keyID) throws ServerException {
+	public Key getKey(String keyID) {
 		readLock.lock();
 		try {
 			if(!hasKey(keyID)) {

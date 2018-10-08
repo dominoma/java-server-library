@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import express.http.response.Response;
 import express.utils.Status;
 
-public class ServerException extends Exception {
+public class ServerException extends RuntimeException {
 
 	/**
 	 * 

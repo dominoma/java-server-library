@@ -16,7 +16,7 @@ public abstract class JWTAuthenticatedRequestHandler extends RequestHandler {
 	private PermissionLevel permissionLevel;
 	
 	@Override
-	public void preHandle() throws ServerException {
+	public void preHandle() {
 		if(getRequest().getAuthorization().size() != 1) {
 			throw new AuthenticationException(); 
 		}

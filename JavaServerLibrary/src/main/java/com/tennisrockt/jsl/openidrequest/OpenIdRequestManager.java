@@ -34,6 +34,7 @@ import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.Duration;
 import org.json.JSONObject;
 
+import com.tennisrockt.jsl.config.ValueSupplier;
 import com.tennisrockt.jsl.exceptions.ServerException;
 import com.tennisrockt.jsl.utils.ServerUtils;
 
@@ -44,21 +45,21 @@ public class OpenIdRequestManager {
 	private OAuth2Client client;
 	private OAuth2AccessToken accessToken;
 	
-	private final String configUrl;
-	private final String username;
-	private final String ptw;
+	private final ValueSupplier<String> configUrl;
+	private final ValueSupplier<String> username;
+	private final ValueSupplier<String> ptw;
 	
 	
 	
-	public OpenIdRequestManager(String configUrl, String username, String ptw) {
+	public OpenIdRequestManager(ValueSupplier<String> configUrl, ValueSupplier<String> username, ValueSupplier<String> ptw) {
 		this.configUrl = configUrl;
 		this.username = username;
 		this.ptw = ptw;
 	}
 	
-	public synchronized void updateConfig() throws ServerException {
+	public synchronized void updateConfig() {
 		try {
-			URL url = new URL(configUrl);
+			URL url = new URL(configUrl.value());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			JSONObject openIdConfig = ServerUtils.parseJSON(con.getInputStream());
@@ -67,13 +68,13 @@ public class OpenIdRequestManager {
 			    URI.create(openIdConfig.getString("authorization_endpoint")),
 			    URI.create(openIdConfig.getString("token_endpoint")),
 			    new Duration(1,0,3600));
-			OAuth2ClientCredentials credentials = new BasicOAuth2ClientCredentials(username, ptw);
+			OAuth2ClientCredentials credentials = new BasicOAuth2ClientCredentials(username.value(), ptw.value());
 			client = new BasicOAuth2Client(provider, credentials, new LazyUri(new Precoded("http://localhost")));
 		} catch (IOException e) {
 			throw new ServerException(e);
 		}
 	}
-	private synchronized boolean checkUpdateTokens() throws ServerException {
+	private synchronized boolean checkUpdateTokens() {
 		try {
 			if(accessToken == null || accessToken.expirationDate().before(DateTime.now())) {
 				accessToken = new ClientCredentialsGrant(client, new BasicScope("openid")).accessToken(executor);
@@ -86,10 +87,10 @@ public class OpenIdRequestManager {
 			throw new ServerException(e);
 		}
 	} 
-	public JSONObject doRequest(String url) throws ServerException {
+	public JSONObject doRequest(String url) {
 		return doRequest(url, null);
 	}
-	public synchronized JSONObject doRequest(String url, JSONObject body) throws ServerException {
+	public synchronized JSONObject doRequest(String url, JSONObject body) {
 		if(client == null) {
 			updateConfig();
 		}

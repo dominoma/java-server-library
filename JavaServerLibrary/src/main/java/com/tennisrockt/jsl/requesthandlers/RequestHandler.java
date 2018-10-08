@@ -57,26 +57,26 @@ public abstract class RequestHandler implements HttpRequestHandler {
 		}
 	}
 	
-	public void preHandle() throws ServerException {
+	public void preHandle() {
 		
 	}
 	
-	public void get() throws ServerException {
+	public void get() {
 		response.sendStatus(Status._405);
 	}
-	public void post() throws ServerException {
+	public void post() {
 		response.sendStatus(Status._405);
 	}
-	public void delete() throws ServerException {
+	public void delete() {
 		response.sendStatus(Status._405);
 	}
-	public void put() throws ServerException {
+	public void put() {
 		response.sendStatus(Status._405);
 	}
-	public void options() throws ServerException {
+	public void options() {
 		//CORS Request returns Access headers (always allowed)
 	}
-	public void head() throws ServerException {
+	public void head() {
 		//HEAD is always allowed
 	}
 	
@@ -92,7 +92,7 @@ public abstract class RequestHandler implements HttpRequestHandler {
 		return response;
 	}
 	
-	public void redirectTo(String requestHandler) throws ServerException {
+	public void redirectTo(String requestHandler) {
 		RequestHandlers.redirect(requestHandler, request, response);
 	}
 	

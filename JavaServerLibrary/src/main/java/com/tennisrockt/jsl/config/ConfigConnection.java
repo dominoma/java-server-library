@@ -7,14 +7,23 @@ public class ConfigConnection {
 
 private static ConsulClient consulClient;
 	
-	private final String consulUrl;
+	private String consulUrl;
 	
 	public ConfigConnection(String consulUrl) {
 		super();
 		this.consulUrl = consulUrl;
 	}
+	public ConfigConnection() {
+		
+	}
 
-	public synchronized void refreshConnection() throws ServerException {
+	public String getConsulUrl() {
+		return consulUrl;
+	}
+	public void setConsulUrl(String consulUrl) {
+		this.consulUrl = consulUrl;
+	}
+	public synchronized void refreshConnection() {
 		
 		try {
 			consulClient = new ConsulClient(consulUrl);
@@ -24,7 +33,7 @@ private static ConsulClient consulClient;
 		
 	}
 	
-	public synchronized void setupConnection() throws ServerException {
+	public synchronized void setupConnection() {
 		if(consulClient == null) {
 			refreshConnection();
 		}
@@ -34,7 +43,7 @@ private static ConsulClient consulClient;
 		return consulUrl == null;
 	}
 	
-	String getValue(String keyName) throws ServerException {
+	String getValue(String keyName) {
 		setupConnection();
 		return consulClient.getKVValue(keyName).getValue().getDecodedValue();
 	}

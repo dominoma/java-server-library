@@ -18,11 +18,11 @@ public class DBCollection {
 		this.collectionName = collectionName;
 	}
 
-	public MongoCollection<Document> get() throws ServerException {
+	public MongoCollection<Document> get() {
 		return connection.getRawCollection(collectionName);
 	}
 	
-	public boolean exists(ObjectId id) throws ServerException {
+	public boolean exists(ObjectId id) {
 		return get().countDocuments(new Document("_id", id)) > 0;
 	}
 
@@ -30,7 +30,7 @@ public class DBCollection {
 		get().insertOne(obj);
 	}
 	
-	public Document findByID(ObjectId id) throws ServerException {
+	public Document findByID(ObjectId id) {
 		Document doc = get().find(new Document("_id", id)).first();
 		if(doc == null) {
 			throw new NotFoundException("Object with id '"+id+"' doesn't exist in '"+collectionName+"'!");
@@ -38,14 +38,14 @@ public class DBCollection {
 		return doc;
 	}
 
-	public void updateByID(ObjectId id, Document obj) throws ServerException {
+	public void updateByID(ObjectId id, Document obj) {
 		if(!exists(id)) {
 			throw new NotFoundException("Object with id '"+id+"' doesn't exist in '"+collectionName+"'!");
 		}
 		get().updateOne(new Document("_id", id), obj);
 	}
 	
-	public void removeByID(ObjectId id) throws ServerException {
+	public void removeByID(ObjectId id) {
 		if(!exists(id)) {
 			throw new NotFoundException("Object with id '"+id+"' doesn't exist in '"+collectionName+"'!");
 		}
