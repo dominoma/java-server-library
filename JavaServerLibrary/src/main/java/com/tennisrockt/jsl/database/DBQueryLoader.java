@@ -17,14 +17,19 @@ import com.tennisrockt.jsl.utils.ServerUtils;
 
 public class DBQueryLoader {
 
-	private static final Map<String, Document> aggregations = new HashMap<>();
+	private final Map<String, Document> aggregations = new HashMap<>();
+	private final String queryPackage;
 	
-	private static Document getParsedAggregation(String location, String name) {
+	public DBQueryLoader(String queryPackage) {
+		this.queryPackage = queryPackage;
+	}
+
+	private Document getParsedAggregation(String name) {
 		if(aggregations.containsKey(name)) {
 			return aggregations.get(name);
 		}
 		else {
-			InputStream in = DBQueryLoader.class.getResourceAsStream(location + name + ".json");
+			InputStream in = DBQueryLoader.class.getResourceAsStream(queryPackage.replaceAll("\\.", "\\") + "\\" + name + ".json");
 			Document aggregation = null;
 			try {
 				String json = ServerUtils.toStringInputStream(in);
@@ -38,7 +43,7 @@ public class DBQueryLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void setVars(Document aggregation, Object...arguments) {
+	private void setVars(Document aggregation, Object...arguments) {
 		if(arguments.length%2 != 0) {
 			throw new IllegalArgumentException("arguments need to be in a key->value pair");
 		}
@@ -58,7 +63,7 @@ public class DBQueryLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void setImports(String location, Document aggregation) {
+	private void setImports(Document aggregation) {
 		List<Document> imports = (List<Document>) aggregation.get("imports");
 		for(Object importObj : imports) {
 			Document dbimport = (Document) importObj;
@@ -71,7 +76,7 @@ public class DBQueryLoader {
 					callargs.add(k);
 					callargs.add(v);
 				});
-				List<Document> callquery = (List<Document>) getAggregation(location, dbimport.getString("name"), callargs.toArray()).get("query");
+				List<Document> callquery = (List<Document>) getAggregation(dbimport.getString("name"), callargs.toArray()).get("query");
 				PropertyPath path = new PropertyPath(call.getString("path"));
 				
 				Object refObj = path.getRefObject(Object.class, aggregation);
@@ -88,20 +93,24 @@ public class DBQueryLoader {
 		}
 	}
 	
-	public static Document getAggregation(String location, String name, Object... arguments) {
-		Document aggregation = getParsedAggregation(location, name);
+	public String getQueryPackage() {
+		return queryPackage;
+	}
+
+	public Document getAggregation(String name, Object... arguments) {
+		Document aggregation = getParsedAggregation(name);
 		if(aggregation.containsKey("vars")) {
 			setVars(aggregation, arguments);
 		}
 		if(aggregation.containsKey("imports")) {
-			setImports(location, aggregation);
+			setImports(aggregation);
 		}
 		return aggregation;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Document> execAggregation(String location, DBCollection collection, String name, Object... arguments) {
-		Document aggregation = getAggregation(location, name, arguments);
+	public List<Document> execAggregation(DBCollection collection, String name, Object... arguments) {
+		Document aggregation = getAggregation(name, arguments);
 		List<Document> pipe = (List<Document>) aggregation.get("query");
 		List<Document> result = Lists.newArrayList(collection.get().aggregate(pipe));
 		return result;
