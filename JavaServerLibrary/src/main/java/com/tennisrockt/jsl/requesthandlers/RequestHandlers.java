@@ -61,6 +61,14 @@ public class RequestHandlers {
 		handlers.get(name).handle(origin.getRequest(), origin.getResponse());
 	}
 	
+	public void listen() {
+		express.listen();
+	}
+	
+	public void stop() {
+		express.stop();
+	}
+	
 	
 	
 }
