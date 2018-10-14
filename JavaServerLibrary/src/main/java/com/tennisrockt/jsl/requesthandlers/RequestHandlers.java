@@ -53,6 +53,7 @@ public class RequestHandlers {
 		for(RequestHandler handler : handlerIcs) {
 			String url = handler.url();
 			if(!url.equals("")) {
+				System.out.println("Setting up '"+url+"'!");
 				express.all(url, handler);
 			}
 		}
