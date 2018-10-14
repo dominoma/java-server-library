@@ -92,10 +92,6 @@ public abstract class RequestHandler implements HttpRequestHandler {
 		return response;
 	}
 	
-	public void redirectTo(String requestHandler) {
-		RequestHandlers.redirect(requestHandler, request, response);
-	}
-	
 	public String name() {
 		return this.getClass().getAnnotation(RegisterHandler.class).name();
 	}
