@@ -1,5 +1,9 @@
 package com.tennisrockt.jsl.requesthandlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 import com.tennisrockt.jsl.exceptions.ServerException;
 
 import express.http.HttpRequestHandler;
@@ -12,6 +16,8 @@ public abstract class RequestHandler implements HttpRequestHandler {
 	
 	private Request request = null;
 	private Response response = null;
+	
+	private final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 	
 	@Override
 	public final void handle(Request req, Response res) {
@@ -47,13 +53,16 @@ public abstract class RequestHandler implements HttpRequestHandler {
 			if(!response.isClosed()) {
 				response.sendStatus(Status._200);
 			}
+		} catch(CriticalServerException e) {
+			e.sendError(response);
+			logger.error(name(), e.getException());
 		} catch(ServerException e) {
 			e.sendError(response);
 		} catch(Exception e) {
 			if(!response.isClosed()) {
 				sendError(Status._500, ServerException.getExceptionJSON(Status._500, e).toString());
 			}
-			e.printStackTrace();
+			logger.error(name(), e);
 		}
 	}
 	

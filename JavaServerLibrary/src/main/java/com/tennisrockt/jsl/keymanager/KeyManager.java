@@ -18,8 +18,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tennisrockt.jsl.config.ValueSupplier;
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 import com.tennisrockt.jsl.exceptions.ServerException;
 import com.tennisrockt.jsl.utils.ServerUtils;
 
@@ -35,6 +38,8 @@ public class KeyManager {
 	private final Lock readLock = readWriteLock.readLock();
 	private final Lock writeLock = readWriteLock.writeLock();
 	
+	private final Logger logger = LoggerFactory.getLogger(KeyManager.class);
+	
 	private final ValueSupplier<String> updateUrl;
 	
 	public KeyManager(ValueSupplier<String> updateUrl) {
@@ -47,7 +52,7 @@ public class KeyManager {
         try {
 			return KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(dmodulus, dexponent));
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 	}
 	
@@ -70,13 +75,15 @@ public class KeyManager {
 	
 	public void updateKeys() {
 		try {
+			logger.info("Updating keys...");
 			URL url = new URL(updateUrl.value());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			JSONArray keysJSON = (JSONArray) ServerUtils.parseJSON(con.getInputStream()).get("keys");
 			insertKeys(keysJSON);
+			logger.info("Keys successfully updated.");
 		} catch (IOException e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 	}
 	
@@ -93,6 +100,7 @@ public class KeyManager {
 		readLock.lock();
 		try {
 			if(!hasKey(keyID)) {
+				logger.info("Key '"+keyID+"' is unknown.");
 				updateKeys();
 				if(!hasKey(keyID)) {
 					throw new IllegalArgumentException("Key with id '"+keyID+"' doesn't exist!");

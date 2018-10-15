@@ -1,11 +1,15 @@
 package com.tennisrockt.jsl.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ecwid.consul.v1.ConsulClient;
-import com.tennisrockt.jsl.exceptions.ServerException;
 
 public class ConfigConnection {
 
-private static ConsulClient consulClient;
+	private static ConsulClient consulClient;
+	
+	private final Logger logger = LoggerFactory.getLogger(ConfigConnection.class);
 	
 	private String consulUrl;
 	
@@ -24,13 +28,9 @@ private static ConsulClient consulClient;
 		this.consulUrl = consulUrl;
 	}
 	public synchronized void refreshConnection() {
-		
-		try {
-			consulClient = new ConsulClient(consulUrl);
-		} catch (Exception e) {
-			throw new ServerException(e);
-		}
-		
+		logger.info("Connecting to Consul...");
+		consulClient = new ConsulClient(consulUrl);
+		logger.info("Connected.");
 	}
 	
 	public synchronized void setupConnection() {

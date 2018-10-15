@@ -11,7 +11,7 @@ import java.util.Map;
 import org.bson.Document;
 
 import com.google.common.collect.Lists;
-import com.tennisrockt.jsl.exceptions.ServerException;
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 import com.tennisrockt.jsl.utils.PropertyPath;
 import com.tennisrockt.jsl.utils.ServerUtils;
 
@@ -35,7 +35,7 @@ public class DBQueryLoader {
 				String json = ServerUtils.toStringInputStream(in);
 				aggregation = Document.parse(json);
 			} catch (IOException e) {
-				throw new ServerException(e);
+				throw new CriticalServerException(e);
 			}
 			aggregations.put(name, aggregation);
 			return aggregation;

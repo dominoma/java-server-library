@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.tennisrockt.jsl.exceptions.ServerException;
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 
 import express.Express;
 
@@ -18,6 +20,8 @@ public class RequestHandlers {
 	private final Map<String, RequestHandler> handlers = new TreeMap<>();
 	private final String handlerPackage;
 	private final Express express = new Express();
+	
+	private final Logger logger = LoggerFactory.getLogger(RequestHandlers.class);
 	
 	
 	public RequestHandlers(String handlerPackage) {
@@ -34,7 +38,7 @@ public class RequestHandlers {
 		for(RequestHandler handler : handlerIcs) {
 			String url = handler.url();
 			if(!url.equals("")) {
-				System.out.println("Setting up '"+url+"'!");
+				logger.info("Setting up '"+handler.name()+"' at '"+url+"'");
 				express.all(url, handler);
 			}
 		}
@@ -49,7 +53,7 @@ public class RequestHandlers {
 				handlers.put(registerHandler.name(), handler);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				throw new ServerException(e);
+				throw new CriticalServerException(e);
 			}
         }
 	}

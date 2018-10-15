@@ -11,9 +11,9 @@ import org.json.JSONObject;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 import com.tennisrockt.jsl.exceptions.JSONFormatException;
 import com.tennisrockt.jsl.exceptions.RequestException;
-import com.tennisrockt.jsl.exceptions.ServerException;
 
 public class ServerUtils {
 	public static String toStringInputStream(InputStream is) throws IOException {
@@ -33,7 +33,7 @@ public class ServerUtils {
 		} catch (JSONException e) {
 			throw new JSONFormatException(e.getMessage());
 		} catch (IOException e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 		
 	}

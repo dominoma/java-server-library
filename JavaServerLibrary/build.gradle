@@ -41,6 +41,9 @@ dependencies {
     compile 'org.dmfs:httpurlconnection-executor:0.16.2'
     
     compile "com.ecwid.consul:consul-api:1.4.1"
+    
+	compile 'org.slf4j:slf4j-simple:1.7.25'
+    
 
 }
 

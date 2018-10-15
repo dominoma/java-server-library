@@ -33,12 +33,12 @@ import org.dmfs.rfc3986.uris.LazyUri;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.Duration;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tennisrockt.jsl.config.ValueSupplier;
-import com.tennisrockt.jsl.exceptions.ServerException;
+import com.tennisrockt.jsl.exceptions.CriticalServerException;
 import com.tennisrockt.jsl.utils.ServerUtils;
-
-import express.utils.Status;
 
 public class OpenIdRequestManager {
 	private final HttpRequestExecutor executor = new HttpUrlConnectionExecutor();
@@ -48,6 +48,8 @@ public class OpenIdRequestManager {
 	private final ValueSupplier<String> configUrl;
 	private final ValueSupplier<String> username;
 	private final ValueSupplier<String> ptw;
+	
+	private final Logger logger = LoggerFactory.getLogger(OpenIdRequestManager.class);
 	
 	
 	
@@ -59,6 +61,7 @@ public class OpenIdRequestManager {
 	
 	public synchronized void updateConfig() {
 		try {
+			logger.info("Updating config...");
 			URL url = new URL(configUrl.value());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
@@ -70,21 +73,24 @@ public class OpenIdRequestManager {
 			    new Duration(1,0,3600));
 			OAuth2ClientCredentials credentials = new BasicOAuth2ClientCredentials(username.value(), ptw.value());
 			client = new BasicOAuth2Client(provider, credentials, new LazyUri(new Precoded("http://localhost")));
+			logger.info("Config successfully updated.");
 		} catch (IOException e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 	}
 	private synchronized boolean checkUpdateTokens() {
 		try {
 			if(accessToken == null || accessToken.expirationDate().before(DateTime.now())) {
+				logger.info("Tokens expired. Fetching new tokens...");
 				accessToken = new ClientCredentialsGrant(client, new BasicScope("openid")).accessToken(executor);
+				logger.info("Tokens successfully fetched.");
 				return true;
 			}
 			else {
 				return false;
 			}
 		} catch (ProtocolException | IOException | ProtocolError e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 	} 
 	public JSONObject doRequest(String url) {
@@ -138,26 +144,16 @@ public class OpenIdRequestManager {
 
 					@Override
 					public JSONObject handleResponse(HttpResponse response) throws IOException, ProtocolError, ProtocolException {
-						try {
-							return ServerUtils.parseJSON(response.responseEntity().contentStream());
-						} catch (ServerException e) {
-							return null;
-						}
+						return ServerUtils.parseJSON(response.responseEntity().contentStream());
 					}
 				};
 			}
 		};
 		try {
 			checkUpdateTokens();
-			JSONObject response = executor.execute(URI.create(url), new BearerAuthenticatedRequest<JSONObject>(request, accessToken));
-			if(response == null) {
-				throw new ServerException(Status._500, "Request failed!");
-			}
-			else {
-				return response;
-			}
+			return executor.execute(URI.create(url), new BearerAuthenticatedRequest<JSONObject>(request, accessToken));
 		} catch (IOException | ProtocolError | ProtocolException e) {
-			throw new ServerException(e);
+			throw new CriticalServerException(e);
 		}
 	}
 }

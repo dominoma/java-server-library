@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import express.http.response.Response;
 import express.utils.Status;
 
-public class ServerException extends RuntimeException {
+public abstract class ServerException extends RuntimeException {
 
 	/**
 	 * 
@@ -22,25 +22,15 @@ public class ServerException extends RuntimeException {
 	}
 	
 	private final Status status;
-	private final Exception exception;
 	
 	public ServerException(Status status, String msg) {
 		super(msg);
 		this.status = status;
-		this.exception = null;
-	}
-	public ServerException(Exception e) {
-		super(e.getMessage());
-		this.status = Status._500;
-		this.exception = e;
 	}
 	
 	public final void sendError(Response res) {
 		if(!res.isClosed()) {
 			doSendError(res);
-		}
-		if(exception != null) {
-			exception.printStackTrace();
 		}
 	}
 	
@@ -52,12 +42,7 @@ public class ServerException extends RuntimeException {
 		return status;
 	}
 	public JSONObject getJSON() {
-		if(exception == null) {
-			return getExceptionJSON(status, this);
-		}
-		else {
-			return getExceptionJSON(status, exception);
-		}
+		return getExceptionJSON(status, this);
 	}
 	
 }
