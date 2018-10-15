@@ -77,8 +77,10 @@ public class KeyManager {
 		try {
 			logger.info("Updating keys...");
 			URL url = new URL(updateUrl.value());
+			System.out.println(updateUrl.value());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
+			con.setConnectTimeout(30000);
 			JSONArray keysJSON = (JSONArray) ServerUtils.parseJSON(con.getInputStream()).get("keys");
 			insertKeys(keysJSON);
 			logger.info("Keys successfully updated.");
